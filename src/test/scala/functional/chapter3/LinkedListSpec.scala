@@ -147,4 +147,41 @@ class LinkedListSpec extends FlatSpec with Matchers {
 
     LinkedList.filter(ll)(_ % 2 == 0) shouldEqual LinkedList(2, 4, 6, 8, 10)
   }
+
+  "flatMap" should "return a flattened mapped list" in {
+    val ll = LinkedList(1, 2, 3)
+
+    LinkedList.flatMap(ll)(i => LinkedList(i,i)) shouldEqual LinkedList(1,1,2,2,3,3)
+  }
+
+  "flatMapFilter" should "implement filter using flatmap" in {
+    val ll = LinkedList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+    LinkedList.flatMapFilter(ll)(_ % 2 == 0) shouldEqual LinkedList(2, 4, 6, 8, 10)
+  }
+
+  "add" should "add the elements in two lists together (ignoring extra elements)" in {
+    val l1 = LinkedList(1, 2, 3)
+    val l2 = LinkedList(10, 10, 10)
+    val l3 = LinkedList(1, 2)
+
+    LinkedList.add(l1, l2) shouldEqual LinkedList(11, 12, 13)
+    LinkedList.add(l1, l3) shouldEqual LinkedList(2, 4)
+    LinkedList.add(l3, l2) shouldEqual LinkedList(11, 12)
+
+    LinkedList.combine(l1, l2)(_ + _) shouldEqual LinkedList(11, 12, 13)
+  }
+
+  "hasSubsequence" should "return whether a list contains a sequence" in {
+    val ll = LinkedList(1, 2, 3, 4, 5, 6, 7)
+    val ss1 = LinkedList(2, 3)
+    val ss2 = LinkedList(6)
+    val ss3 = LinkedList(5, 4)
+    val ss4 = LinkedList(8)
+
+    LinkedList.hasSubsequence(ll, ss1) shouldEqual true
+    LinkedList.hasSubsequence(ll, ss2) shouldEqual true
+    LinkedList.hasSubsequence(ll, ss3) shouldEqual false
+    LinkedList.hasSubsequence(ll, ss4) shouldEqual false
+  }
 }

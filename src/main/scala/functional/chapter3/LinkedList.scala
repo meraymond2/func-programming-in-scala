@@ -124,4 +124,46 @@ object LinkedList {
     foldRight(l, LinkedList[A]())((a: A, z: LinkedList[A]) =>
       if (f(a)) Cons(a, z) else z
     )
+
+  // is there a shorter way to do this?
+  def flatMap[A,B](l: LinkedList[A])(f: A => LinkedList[B]): LinkedList[B] =
+    flatten(map(l)(f))
+
+  // don’t really get this question
+  def flatMapFilter[A](l: LinkedList[A])(f: A => Boolean): LinkedList[A] =
+    flatMap(l)((a: A) =>
+      if (f(a)) LinkedList(a) else Nil
+    )
+
+  def add(l1: LinkedList[Int], l2: LinkedList[Int]): LinkedList[Int] = l1 match {
+    case Nil => Nil
+    case Cons(x, xs) => l2 match {
+      case Nil => Nil
+      case Cons(x2, xs2) => Cons(x + x2, add(xs, xs2))
+    }
+  }
+
+  def combine[A](l1: LinkedList[A], l2: LinkedList[A])(f: (A,A) => A): LinkedList[A] =
+    l1 match {
+      case Nil => Nil
+      case Cons(x, xs) => l2 match {
+        case Nil => Nil
+        case Cons(x2, xs2) => Cons(f(x, x2), combine(xs, xs2)(f))
+      }
+    }
+
+  def hasSubsequence[A](l: LinkedList[A], s: LinkedList[A]): Boolean = {
+    @annotation.tailrec
+    def loop(ll: LinkedList[A], ss: LinkedList[A], z: Boolean): Boolean = ll match {
+      case Nil => z
+      case Cons(x, xs) => ss match {
+        case Nil => z
+        case Cons(x2, xs2) =>
+          if (x == x2) loop(xs, xs2, z = true)
+          else loop(xs, ss, z = false)
+      }
+    }
+    loop(l, s, z = false)
+  }
+
 }
