@@ -132,9 +132,14 @@ class LinkedListSpec extends FlatSpec with Matchers {
   "map" should "apply a function to each member in a list" in {
     val ll = LinkedList("a", "b", "c")
     val l2 = LinkedList(1, 2, 3)
+    val empty: LinkedList[Int] = Nil
 
     LinkedList.map(ll)(_.toUpperCase()) shouldEqual LinkedList("A", "B", "C")
     LinkedList.map(l2)(_.toString()) shouldEqual LinkedList("1", "2", "3")
+
+    LinkedList.map2(ll)(_.toUpperCase()) shouldEqual LinkedList("A", "B", "C")
+    LinkedList.map2(l2)(_.toString()) shouldEqual LinkedList("1", "2", "3")
+    LinkedList.map2(empty)(_.toString()) shouldEqual Nil
   }
 
   "filter" should "remove the elements that fail a condition" in {
@@ -143,5 +148,3 @@ class LinkedListSpec extends FlatSpec with Matchers {
     LinkedList.filter(ll)(_ % 2 == 0) shouldEqual LinkedList(2, 4, 6, 8, 10)
   }
 }
-
-

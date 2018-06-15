@@ -115,6 +115,11 @@ object LinkedList {
   def map[A,B](l: LinkedList[A])(f: A => B): LinkedList[B] =
     foldRight(l, LinkedList[B]())((a: A, z: LinkedList[B]) => Cons(f(a), z))
 
+  def map2[A, B](l: LinkedList[A])(f: A => B): LinkedList[B] = l match {
+    case Nil          => Nil
+    case Cons(x, xs)  => Cons(f(x), map2(xs)(f))
+  }
+
   def filter[A](l: LinkedList[A])(f: A => Boolean): LinkedList[A] =
     foldRight(l, LinkedList[A]())((a: A, z: LinkedList[A]) =>
       if (f(a)) Cons(a, z) else z
