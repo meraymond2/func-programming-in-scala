@@ -1,0 +1,7 @@
+# IDEs
+.idea/
+**.iml
+
+# Scala
+project/target/
+target/
