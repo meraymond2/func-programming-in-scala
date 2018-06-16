@@ -11,7 +11,7 @@ class LinkedListSpec extends FlatSpec with Matchers {
 
 
     val ll2 = Nil
-    // More Haskelly
+    // also possible, but not Scala-style
     LinkedList tail ll2 shouldEqual Nil
   }
 

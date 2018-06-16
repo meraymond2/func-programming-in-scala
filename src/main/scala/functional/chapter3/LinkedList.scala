@@ -1,5 +1,6 @@
 package functional.chapter3
 
+
 /*
   sealed trait — all implementations must be declared in same file
   it's different from an abstract class, because it has no constructor
