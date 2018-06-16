@@ -50,6 +50,19 @@ class OptionSpec extends FlatSpec with Matchers {
     some.filter(_ > 5) shouldEqual Just(10)
     some.filter(_ > 15) shouldEqual Nix
     none.filter(_ > 5) shouldEqual Nix
+
+    some.filter2(_ > 5) shouldEqual Just(10)
+    some.filter2(_ > 15) shouldEqual Nix
+    none.filter2(_ > 5) shouldEqual Nix
   }
 
+  "map2" should "combine two options into a new value" in {
+    val s1 = Just(10)
+    val s2 = Just(15)
+    val n: Maybe[Int] = Nix
+
+    Chapter4.map2(s1, s2)((a, b) => a + b) shouldEqual Just(25)
+    Chapter4.map2(n, s2)((a, b) => a + b) shouldEqual Nix
+    Chapter4.map2(s1, n)((a, b) => a + b) shouldEqual Nix
+  }
 }
