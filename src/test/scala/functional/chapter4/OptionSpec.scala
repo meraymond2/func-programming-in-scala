@@ -65,4 +65,8 @@ class OptionSpec extends FlatSpec with Matchers {
     Chapter4.map2(n, s2)((a, b) => a + b) shouldEqual Nix
     Chapter4.map2(s1, n)((a, b) => a + b) shouldEqual Nix
   }
+
+  "sequence" should "return a list of all the values if they’re all defined" in {
+    
+  }
 }

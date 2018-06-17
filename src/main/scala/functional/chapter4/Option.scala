@@ -80,4 +80,6 @@ object Chapter4 {
       p1.matcher(s).matches && p2.matcher(s).matches
     )
 
+  def sequence[A](a: List[Maybe[A]]): Maybe[List[A]] = Nix
+
 }
