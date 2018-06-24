@@ -67,6 +67,21 @@ class OptionSpec extends FlatSpec with Matchers {
   }
 
   "sequence" should "return a list of all the values if they’re all defined" in {
-    
+    val l1 = List(Just("Luna"), Just("Cas"), Just("Sherlock"))
+    val l2 = List(Just("Luna"), Just("Cas"), Nix, Just("Sherlock"))
+
+    Chapter4.sequence(l1) shouldEqual Just(List("Luna", "Cas", "Sherlock"))
+    Chapter4.sequence(l2) shouldEqual Nix
+  }
+
+  "traverse" should "map a list with an function that might fail, returning an option of a list" in {
+    def safeDivide(x: Int, y: Int): Maybe[Int] = if (y == 0) Nix else Just(x / y)
+    val pf = safeDivide(100, _: Int)
+
+    val l1 = List(2, 5, 10, 22, 48, 1)
+    val l2 = List(88, 3, 0, 44, 777, 10)
+
+    Chapter4.traverse(l1)(pf) shouldEqual Just(List(50, 20, 10, 4, 2, 100))
+    Chapter4.traverse(l2)(pf) shouldEqual Nix
   }
 }

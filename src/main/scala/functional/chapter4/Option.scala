@@ -80,6 +80,21 @@ object Chapter4 {
       p1.matcher(s).matches && p2.matcher(s).matches
     )
 
-  def sequence[A](a: List[Maybe[A]]): Maybe[List[A]] = Nix
+  // Exercise 5
+  def sequence[A](a: List[Maybe[A]]): Maybe[List[A]] = a.foldRight[Maybe[List[A]]](Just(List.empty[A]))((opt, z) => z match {
+    case Nix        => Nix
+    case Just(list) => opt match {
+      case Nix         => Nix
+      case Just(value) => Just(value :: list)
+    }
+  })
 
+  // Exercise 6
+  def traverse[A, B](a: List[A])(f: A => Maybe[B]): Maybe[List[B]] = a.foldRight[Maybe[List[B]]](Just(List.empty[B]))((i, z) => z match {
+    case Nix => Nix
+    case Just(list) => f(i) match {
+      case Nix         => Nix
+      case Just(value) => Just(value :: list)
+    }
+  })
 }
