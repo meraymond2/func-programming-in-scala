@@ -32,6 +32,7 @@ trait LazyList[+A] {
   source is infinite.
 
   Is it possible to append without iterating through the stream?
+  Update: probably not, but there are prettier ways to do it with foldRight and unfold.
   */
 
   /* Exercise 3 */
@@ -96,6 +97,70 @@ trait LazyList[+A] {
       )
     )
 
+  /* Exercise 12 */
+  def map2[B](f: A => B): LazyList[B] =
+    LazyList.unfold(uncons) {
+      case None         => None
+      case Some((h, t)) => Some((f(h), t.uncons))
+    }
+
+  def take2(n: Int): LazyList[A] =
+    LazyList.unfold((uncons, 0)) {
+      case (Some((h, t)), i) if i < n => Some(h, (t.uncons, i + 1))
+      case _                          => None
+    }
+
+  def takeWhile3(p: A => Boolean): LazyList[A] =
+    LazyList.unfold(uncons) {
+      case Some((h, t)) if p(h) => Some(h, t.uncons)
+      case _                    => None
+    }
+
+  def zip[B](ll: LazyList[B]): LazyList[(A, B)] =
+    LazyList.unfold((uncons, ll.uncons)) {
+      case (Some((h1, t1)), Some((h2, t2))) => Some((h1, h2), (t1.uncons, t2.uncons))
+      case _                                => None
+    }
+
+  def zipAll[B](ll: LazyList[B]): LazyList[(Option[A], Option[B])] =
+    LazyList.unfold((uncons, ll.uncons)) {
+      case (Some((h1, t1)), Some((h2, t2))) => Some((Some(h1), Some(h2)), (t1.uncons, t2.uncons))
+      case (Some((h1, t1)), None)           => Some((Some(h1), None), (t1.uncons, None))
+      case (None, Some((h2, t2)))           => Some((None, Some(h2)), (None, t2.uncons))
+      case (None, None)                     => None
+    }
+
+  /* Exercise 13 */
+  def startsWith[B >: A](ss: LazyList[B]): Boolean = {
+    val zipped = zip(ss)
+    if (zipped.isEmpty) false
+    else zipped.foldRight(true) { case ((h1, h2), z) => h1 == h2 && z }
+  }
+
+  /* Exercise 14 */
+  def tails: LazyList[LazyList[A]] =
+    LazyList.cons(
+      head = this,
+      LazyList.unfold(uncons) {
+        case Some((_, t)) => Some(t, t.uncons)
+        case None         => None
+      }
+    )
+
+  def hasSubsequence[B >: A](ss: LazyList[B]): Boolean =
+    tails.exists(_.startsWith(ss))
+
+  /* Exercise 15 */
+  def scanRight[B](z: B)(f: (A, => B) => B): LazyList[B] =
+    LazyList.unfold(uncons) {
+      case Some((h, t)) => Some(f(h, t.foldRight(z)(f)), t.uncons)
+      case None         => None
+    }.append(z)
+
+  def scanRight2[B](z: B)(f: (A, => B) => B): LazyList[B] =
+    tails.map(_.foldRight(z)(f))
+  // these both work but I don't think either it O(n)
+
 }
 
 object LazyList {
@@ -130,9 +195,8 @@ object LazyList {
   /* Exercise 10 */
   def unfold[A, S](z: S)(f: S => Option[(A, S)]): LazyList[A] =
     f(z) match {
-      case Some((a, b)) =>
-        cons(a, unfold(b)(f))
-      case None => LazyList.empty[A]
+      case Some((a, b)) => cons(a, unfold(b)(f))
+      case None         => LazyList.empty[A]
     }
 
   /* Exercise 11 */
@@ -150,8 +214,5 @@ object LazyList {
 
   def twos: LazyList[Int] =
     unfold(2)(_ => Some(2, 2))
-
-  /* Exercise 12 */
-  // TODO
 
 }

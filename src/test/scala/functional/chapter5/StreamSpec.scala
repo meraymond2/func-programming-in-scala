@@ -101,6 +101,73 @@ class StreamSpec extends FlatSpec with Matchers {
 
     val twos = LazyList.twos
     twos.take(12).toList shouldEqual List(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+
+    val mapped = LazyList.twos.map2(_ * 10)
+    mapped.take(5).toList shouldEqual List(20, 20, 20, 20, 20)
+
+    mapped.take2(5).toList shouldEqual List(20, 20, 20, 20, 20)
+
+    fibs.takeWhile3(_ < 100).toList shouldEqual List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89)
+
+    val indexes = LazyList.from(0)
+    fibs.zip(indexes).take2(5).toList shouldEqual List((0, 0), (1, 1), (1, 2), (2, 3), (3, 4))
+
+    val finite = LazyList.from(0).take(3)
+    finite.zip(twos).toList shouldEqual List((0, 2), (1, 2), (2, 2))
+
+    val finiteTwo = LazyList.twos.take(5)
+    finite.zipAll(finiteTwo).toList shouldEqual List(
+      Some(0) -> Some(2),
+      Some(1) -> Some(2),
+      Some(2) -> Some(2),
+      None    -> Some(2),
+      None    -> Some(2)
+    )
+
+  }
+
+  "startsWith" should "return true if the streams begins with the substream" in {
+    val ss = LazyList(0, 1, 1, 2, 3)
+    val ss2 = LazyList(0, 1, 1, 3, 5)
+    val ss3 = LazyList(1, 1, 2, 3, 5)
+
+    LazyList.fibs.startsWith(ss) shouldBe true
+    LazyList.fibs.startsWith(ss2) shouldBe false
+    LazyList.fibs.startsWith(ss3) shouldBe false
+  }
+
+  "tails" should "return the stream of suffixes of the input sequnce" in {
+    val ll = LazyList(1, 2, 3)
+    val llTails = LazyList(
+      LazyList(1, 2, 3),
+      LazyList(2, 3),
+      LazyList(3),
+      LazyList.empty[Int]
+    )
+
+    ll.tails.toList.map(_.toList) shouldEqual llTails.toList.map(_.toList)
+  }
+
+  "hasSubsequence" should "return true if the stream contains the substream" in {
+    val ss = LazyList(8, 13, 21, 34)
+    val ss2 = LazyList(8, 13, 13, 21, 34)
+
+    LazyList.fibs.take(100).hasSubsequence(ss) shouldBe true
+    LazyList.fibs.take(100).hasSubsequence(ss2) shouldBe false
+
+    val ll = LazyList(1, 2, 3, 4, 5, 1, 2, 5)
+    val ss3 = LazyList(1, 2, 5)
+    val ss4 = LazyList(1, 2, 4)
+
+    ll.hasSubsequence(ss3) shouldBe true
+    ll.hasSubsequence(ss4) shouldBe false
+  }
+
+  "scanRight" should "return a stream folded, but with intermediate values" in {
+    val ll = LazyList(1, 2, 3)
+
+    ll.scanRight(0)(_ + _).toList shouldEqual List(6, 5, 3, 0)
+    ll.scanRight2(0)(_ + _).toList shouldEqual List(6, 5, 3, 0)
   }
 
 }
