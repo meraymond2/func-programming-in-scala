@@ -1,4 +1,5 @@
 package functional.Chapter6
+
 import org.scalatest._
 
 class RNGSpec extends FlatSpec with Matchers {
@@ -48,11 +49,16 @@ class RNGSpec extends FlatSpec with Matchers {
   "ints" should "return a list of length n of psuedo-random integers" in {
     val rng = RNG.simple(seed)
 
-    val (ints, rng2) = RNG.ints(rng, 5)
-    val (ints2, _) = RNG.ints(rng, 6)
+    val (ints, rng2) = RNG.ints(5)(rng)
+    val (ints2, _) = RNG.ints(6)(rng)
 
     ints shouldEqual List(149386600, 1840538571, -2068089078, -552103298, -247797879)
     ints2 shouldEqual List(-2063692454, 149386600, 1840538571, -2068089078, -552103298, -247797879)
+  }
+
+  /* Exercise 5 */
+  "positiveMax" should "return a pseudo random number between 0 and n" in {
+
   }
 
 }
