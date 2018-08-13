@@ -9,8 +9,17 @@ trait RNG {
 object RNG {
 
   type Rand[+A] = RNG => (A, RNG)
+//  type Rand[A] = State[RNG, A] -> doesn't compile
 
-  val int: Rand[Int] = _.nextInt // ??
+  /*
+  This looked very confusing at first, but it's just:
+    def int: Rand[Int] = rng => rng.nextInt
+
+  That is, it takes a RNG, calls the next int method and return a
+  tuple with the int and the new RNG. I could do the same with all of the
+  functions below that don't take arguments.
+   */
+  val int: Rand[Int] = _.nextInt
 
   def simple(seed: Long): RNG = new RNG {
     def nextInt: (Int, RNG) = {
@@ -117,4 +126,37 @@ object RNG {
       }
     })
 
+}
+
+case class State[S,+A](run: S => (A,S)) {
+
+  /* Exercise 11 */
+  def unit[B >: A](a: B): State[S, B] =
+    State(state => (a, state)) // or State(run)?
+
+  def map[B](f: A => B): State[S, B] =
+    State(state => {
+      val (a, state2) = run(state)
+      (f(a), state2)
+    })
+
+  def flatMap[B](f: A => State[S, B]): State[S, B] =
+    State(state => {
+      val (a, state2) = run(state)
+      f(a).run(state2)
+    })
+}
+
+object State {
+
+  def sequence[S, A](fs: List[State[S, A]]): State[S, List[A]] = {
+    def loop(s: S, remaining: List[State[S, A]], res: List[A]): (List[A], S) = remaining match {
+      case x :: xs =>
+        val (a, s2) = x.run(s)
+        loop(s2, xs, a +: res)
+      case Nil =>
+        (res, s)
+    }
+    State(state => loop(state, fs, List.empty[A]))
+  }
 }

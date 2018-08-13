@@ -116,4 +116,30 @@ class RNGSpec extends FlatSpec with Matchers {
 
   }
 
+  /* Exercise 11 */
+  "State" should "have all the functionality of RNG, generalised" in {
+
+    val rng = RNG.simple(seed)
+    val IntGen = State[RNG, Int](_.nextInt)
+
+    val (int, _) = IntGen.run(rng)
+    int shouldEqual -247797879
+
+    val (mapped, _) = IntGen.map(_.abs).run(rng)
+    mapped shouldEqual 247797879
+
+    val (flatMapped, _): ((Int, Int), RNG) = IntGen.flatMap(int =>
+      State(rng => {
+        val (int2, rng2) = rng.nextInt
+        ((int, int2), rng2)
+      })
+    ).run(rng)
+
+    flatMapped shouldEqual (-247797879, -552103298)
+
+    val (sequence, _) = State.sequence(List.fill(5)(IntGen)).run(rng)
+    sequence shouldEqual List(149386600, 1840538571, -2068089078, -552103298, -247797879)
+
+  }
+
 }
