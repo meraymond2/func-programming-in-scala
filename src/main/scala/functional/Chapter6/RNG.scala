@@ -12,7 +12,7 @@ object RNG {
 //  type Rand[A] = State[RNG, A] -> doesn't compile
 
   /*
-  This looked very confusing at first, but it's just:
+  This looked very confusing at first, but it's the same as:
     def int: Rand[Int] = rng => rng.nextInt
 
   That is, it takes a RNG, calls the next int method and return a
